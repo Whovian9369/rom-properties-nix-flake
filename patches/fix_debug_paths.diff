@@ -1,0 +1,34 @@
+diff --git a/cmake/macros/DirInstallPaths.cmake b/cmake/macros/DirInstallPaths.cmake
+index 7aefd5de6..1b180e3d2 100644
+--- a/cmake/macros/DirInstallPaths.cmake
++++ b/cmake/macros/DirInstallPaths.cmake
+@@ -65,10 +65,10 @@ IF(UNIX AND NOT APPLE)
+ 	SET(DIR_INSTALL_XDG_MIME "share/mime")
+ 	SET(DIR_INSTALL_XDG_DESKTOP "share/applications")
+ 	SET(DIR_INSTALL_XDG_APPSTREAM "share/metainfo")
+-	SET(DIR_INSTALL_EXE_DEBUG "lib/debug/${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_EXE}")
+-	SET(DIR_INSTALL_DLL_DEBUG "lib/debug/${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_DLL}")
+-	SET(DIR_INSTALL_LIB_DEBUG "lib/debug/${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_LIB}")
+-	SET(DIR_INSTALL_LIBEXEC_DEBUG "lib/debug/${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_LIBEXEC}")
++	SET(DIR_INSTALL_EXE_DEBUG "lib/debug/bin")
++	SET(DIR_INSTALL_DLL_DEBUG "lib/debug/lib")
++	SET(DIR_INSTALL_LIB_DEBUG "lib/debug/lib")
++	SET(DIR_INSTALL_LIBEXEC_DEBUG "lib/debug/libexec")
+ 
+ 	# AppArmor profile directory
+ 	SET(DIR_INSTALL_APPARMOR "/etc/apparmor.d")
+@@ -88,10 +88,10 @@ ELSEIF(APPLE)
+ 	UNSET(DIR_INSTALL_XDG_MIME)
+ 	UNSET(DIR_INSTALL_XDG_DESKTOP)
+ 	UNSET(DIR_INSTALL_XDG_APPSTREAM)
+-	SET(DIR_INSTALL_EXE_DEBUG "lib/debug/${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_EXE}")
+-	SET(DIR_INSTALL_DLL_DEBUG "lib/debug/${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_DLL}")
+-	SET(DIR_INSTALL_LIB_DEBUG "lib/debug/${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_LIB}")
+-	SET(DIR_INSTALL_LIBEXEC_DEBUG "lib/debug/${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_LIBEXEC}")
++	SET(DIR_INSTALL_EXE_DEBUG "lib/debug/bin")
++	SET(DIR_INSTALL_DLL_DEBUG "lib/debug/lib")
++	SET(DIR_INSTALL_LIB_DEBUG "lib/debug/lib")
++	SET(DIR_INSTALL_LIBEXEC_DEBUG "lib/debug/libexec")
+ ELSEIF(WIN32)
+ 	# Win32-style install paths.
+ 	# Files are installed relative to root, since the

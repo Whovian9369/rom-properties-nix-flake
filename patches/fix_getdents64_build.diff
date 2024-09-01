@@ -1,0 +1,12 @@
+diff --git a/src/librpsecure/os-secure_linux.c b/src/librpsecure/os-secure_linux.c
+index bd245ff40..0a4c7159f 100644
+--- a/src/librpsecure/os-secure_linux.c
++++ b/src/librpsecure/os-secure_linux.c
+@@ -71,6 +71,7 @@ int rp_secure_enable(rp_secure_param_t param)
+ 		SCMP_SYS(read),
+ 		SCMP_SYS(rt_sigreturn),
+ 		SCMP_SYS(write),
++		SCMP_SYS(getdents64),
+ 
+ 		SCMP_SYS(access),
+ 		SCMP_SYS(faccessat),	// Linux on aarch64 does not have an access() syscall

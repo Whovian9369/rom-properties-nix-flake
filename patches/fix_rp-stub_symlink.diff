@@ -1,0 +1,13 @@
+diff --git a/src/rp-stub/CMakeLists.txt b/src/rp-stub/CMakeLists.txt
+index acad9bdcd..d611b38cf 100644
+--- a/src/rp-stub/CMakeLists.txt
++++ b/src/rp-stub/CMakeLists.txt
+@@ -39,7 +39,7 @@ INCLUDE(DirInstallPaths)
+ # Create symlinks for rp-thumbnail and rp-config.
+ # Reference: https://stackoverflow.com/questions/34578362/how-can-i-package-a-symlink-with-cpack
+ ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME} POST_BUILD
+-	COMMAND ln -sf "${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_EXE}/${PROJECT_NAME}" rp-thumbnail
++	COMMAND ln -sf "${DIR_INSTALL_EXE}/${PROJECT_NAME}" rp-thumbnail
+ 	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+ 	VERBATIM
+ 	)
