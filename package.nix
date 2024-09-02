@@ -209,6 +209,7 @@ stdenv.mkDerivation {
     ./patches/fix_getdents64_build.diff
     ./patches/fix_rp-stub_symlink.diff
     ./patches/fix_kf6_plugindir.diff
+    ./patches/fix_libexec.diff
       # Thank you so much for the help with this, @leo60228!
   ];
 
