@@ -1,0 +1,13 @@
+diff --git a/src/libromdata/config.libromdata.h.in b/src/libromdata/config.libromdata.h.in
+index 206a346..19e74b5 100644
+--- a/src/libromdata/config.libromdata.h.in
++++ b/src/libromdata/config.libromdata.h.in
+@@ -16,7 +16,7 @@
+ #endif
+ 
+ /* libexec path for rp-download */
+-#define DIR_INSTALL_LIBEXEC "@CMAKE_INSTALL_PREFIX@/@DIR_INSTALL_LIBEXEC@"
++#define DIR_INSTALL_LIBEXEC "@DIR_INSTALL_LIBEXEC@"
+ 
+ /* share path for amiibo data */
+ #if !defined(_WIN32) && !defined(__APPLE__)
