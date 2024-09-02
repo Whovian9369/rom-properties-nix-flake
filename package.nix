@@ -72,7 +72,7 @@
 
 stdenv.mkDerivation {
   pname = "rom-properties";
-  version = "git";
+  version = "unstable-2024-08-14";
     # + lib.optionals build_gtk3_plugin "-gtk3"
     # + lib.optionals build_gtk4_plugin "-gtk4"
     # + lib.optionals build_kde4_plugin "-kde4"
