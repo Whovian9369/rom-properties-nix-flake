@@ -72,19 +72,19 @@
 
 stdenv.mkDerivation {
   pname = "rom-properties";
-  version = "unstable-2024-08-14";
-    # + lib.optionals build_gtk3_plugin "-gtk3"
-    # + lib.optionals build_gtk4_plugin "-gtk4"
-    # + lib.optionals build_kde4_plugin "-kde4"
-    # + lib.optionals build_kf5_plugin  "-kde5"
-    # + lib.optionals build_kf6_plugin  "-kde6"
-    # + lib.optionals build_xfce_plugin "-xfce"
+  version = "unstable-2024-11-17"
+    + lib.optionalString build_gtk3_plugin "-gtk3"
+    + lib.optionalString build_gtk4_plugin "-gtk4"
+    + lib.optionalString build_kde4_plugin "-kde4"
+    + lib.optionalString build_kf5_plugin  "-kde5"
+    + lib.optionalString build_kf6_plugin  "-kde6"
+    + lib.optionalString build_xfce_plugin "-xfce";
 
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "82ddbbe6574ba64d12c09229ff275bd9f5ba3f1e";
-    hash = "sha256-Xj0xGcA/2hqk0gNLOOrqWxNjWONhH6J3VIF4Up/6NVU=";
+    rev = "196dfe2bb5d41049afc3b4762e4a9d58c5f87506";
+    hash = "sha256-4EyuxXdWgNw8Mj4gXbCgtgyIn5FDKJJW8hmm0ccG6gE=";
   };
 
   nativeBuildInputs = [
@@ -92,6 +92,7 @@ stdenv.mkDerivation {
     ninja
     pkg-config
   ]
+    # KDE 6
     ++ lib.optionals build_kf6_plugin  [ wrapQtAppsHook ];
 
   buildInputs = [
@@ -125,15 +126,30 @@ stdenv.mkDerivation {
     ++ lib.optionals build_gtk4_plugin [ gtk4 cairo gsound ]
     ++ lib.optionals build_kde4_plugin [ ]
     ++ lib.optionals build_kf5_plugin  [ ]
-    ++ lib.optionals build_kf6_plugin  [ qtbase kio kwidgetsaddons kfilemetadata ];
+    ++ lib.optionals build_kf6_plugin  [
+      qtbase
+      kio
+      kwidgetsaddons
+      kfilemetadata
+    ];
   # ];
 
   /*
-    * All: curl zlib libpng libjpeg-turbo nettle pkgconf tinyxml2 gettext libseccomp
-    * Optional decompression: zstd lz4 lzo
-    * KDE 5.x: qt5-base qt5-tools extra-cmake-modules kio kwidgetsaddons kfilemetadata
-    * XFCE (GTK+ 3.x): glib2 gtk3 cairo gsound
-    * GNOME, MATE, Cinnamon: glib2 gtk3 cairo libnautilus-extension gsound
+
+    * All:
+      curl zlib libpng libjpeg-turbo nettle pkgconf tinyxml2 gettext libseccomp
+
+    * Optional decompression:
+      zstd lz4 lzo
+
+    * KDE 5.x:
+      qt5-base qt5-tools extra-cmake-modules kio kwidgetsaddons kfilemetadata
+
+    * XFCE (GTK+ 3.x):
+      glib2 gtk3 cairo gsound
+
+    * GNOME, MATE, Cinnamon:
+      glib2 gtk3 cairo libnautilus-extension gsound
   */
 
   separateDebugInfo = true;
@@ -141,7 +157,7 @@ stdenv.mkDerivation {
   cmakeFlags = [
     # (lib.cmakeBool "BUILD_CLI" true)
       # Build the `rpcli` command line program.
-      # Already set to "ON" in "cmake/options.cmake" so not too worried about
+      # Already set to `ON` in `cmake/options.cmake` so not too worried about
         # setting it again.
 
     (lib.cmakeBool "INSTALL_APPARMOR" false)
@@ -182,6 +198,20 @@ stdenv.mkDerivation {
     (lib.cmakeBool "INSTALL_DEBUG" false)
       # Install the split debug files, if those are enabled via "SPLIT_DEBUG".
 
+    (lib.cmakeBool "ENABLE_NIXOS" true)
+      # Special handling for NixOS
+        # Basically a hack to fix two issues I had made patches for before
+        # reporting the issues upstream.
+
+        # Due to odd path issues, debug file paths were seemingly duplicated
+        # multiple times in the output path.
+
+        # There's also a fix for system calls used, but only appears to be
+        # required on NixOS?
+
+        # Specifics can be found at
+        # https://github.com/GerbilSoft/rom-properties/commit/adc780f1138a1450fcf98e183253d2a3fa3ce46a
+
     /*
       # Flags enabled when on Windows
       # Not needed here since we're getting them from Nixpkgs.
@@ -195,47 +225,56 @@ stdenv.mkDerivation {
 
     ]
       # GNOME Tracker
-      ++ lib.optionals useTracker [ (lib.cmakeFeature "TRACKER_INSTALL_API_VERSION" "3")]
+      ++ lib.optionals useTracker [
+        (lib.cmakeFeature "TRACKER_INSTALL_API_VERSION" "3")
+      ]
       # GUI Plugins
-      ++ lib.optionals build_gtk3_plugin [ (lib.cmakeOptionType "string" "UI_FRONTENDS" "GTK3") ]
-      ++ lib.optionals build_gtk4_plugin [ (lib.cmakeOptionType "string" "UI_FRONTENDS" "GTK4") ]
-      ++ lib.optionals build_kde4_plugin [ (lib.cmakeOptionType "string" "UI_FRONTENDS" "KDE4") ]
-      ++ lib.optionals build_kf5_plugin  [ (lib.cmakeOptionType "string" "UI_FRONTENDS" "KF5") ]
-      ++ lib.optionals build_kf6_plugin  [ (lib.cmakeOptionType "string" "UI_FRONTENDS" "KF6") ]
-      ++ lib.optionals build_xfce_plugin [ (lib.cmakeOptionType "string" "UI_FRONTENDS" "XFCE") ];
+      ++ lib.optionals build_gtk3_plugin [
+        (lib.cmakeOptionType "string" "UI_FRONTENDS" "GTK3")
+      ]
+      ++ lib.optionals build_gtk4_plugin [
+        (lib.cmakeOptionType "string" "UI_FRONTENDS" "GTK4")
+      ]
+      ++ lib.optionals build_kde4_plugin [
+        (lib.cmakeOptionType "string" "UI_FRONTENDS" "KDE4")
+      ]
+      ++ lib.optionals build_kf5_plugin  [
+        (lib.cmakeOptionType "string" "UI_FRONTENDS" "KF5")
+      ]
+      ++ lib.optionals build_kf6_plugin  [
+        (lib.cmakeOptionType "string" "UI_FRONTENDS" "KF6")
+      ]
+      ++ lib.optionals build_xfce_plugin [
+        (lib.cmakeOptionType "string" "UI_FRONTENDS" "XFCE")
+      ];
 
   patches = [
-    ./patches/fix_debug_paths.diff
-    ./patches/fix_getdents64_build.diff
-    ./patches/fix_rp-stub_symlink.diff
     ./patches/fix_kf6_plugindir.diff
     ./patches/fix_libexec.diff
-      # Thank you so much for the help with this, @leo60228!
+      # Thank you so much for the help with these, @leo60228!
   ];
 
   /*
-    About "patches":
-      "fix_debug_paths.diff" is needed to properly have some correct debug
-        paths, due to "cmake"'s weird path issues.
-      (See below references for "fix_rp-stub_symlink.diff".)
+    About used patches:
+      `fix_kf6_plugindir.diff` fixes the KDE 6 plugin path.
+        Makes the build use KDE's `cmake` logic for finding the plugin install
+        path instead of doing it manually.
+        (Technically it's a Qt thing and not KDE, but this is for KDE so...)
 
-      "fix_getdents64_build.diff" is needed to properly complete and then run
-        the build as it's not being detected automatically.
-      (Maybe it's an issue with WSL, though I doubt that?)
 
-      "fix_rp-stub_symlink.diff" is needed to properly symlink
-        `result/libexec/rp-thumbnail` to `result/bin/rp-stub` due to the odd
-        double-path bug as described in
-        https://github.com/NixOS/nixpkgs/issues/144170
-          # CMake incorrect absolute include/lib paths tracking issue
-        https://github.com/NixOS/nixpkgs/pull/172347 and
-          #  cmake: add check-pc-files hook to check broken pc files
-        https://github.com/NixOS/nixpkgs/pull/247474
-          #  cmake: make check-pc-files hook also check .cmake files
+      `fix_libexec.diff` fixes where `result/lib/libromdata.so.5.0` looks for
+        `rp-download` at runtime. Seems to mainly affect use of the GUI plugin.
   */
 
   meta = {
-    description = "ROM Properties Page shell extension";
+    description = "ROM Properties Page shell extension"
+      + lib.optionalString build_gtk3_plugin " (GTK3)"
+      + lib.optionalString build_gtk4_plugin " (GTK4)"
+      + lib.optionalString build_kde4_plugin " (KDE4)"
+      + lib.optionalString build_kf5_plugin  " (KDE5)"
+      + lib.optionalString build_kf6_plugin  " (KDE6)"
+      + lib.optionalString build_xfce_plugin " (XFCE)";
+
     homepage = "https://github.com/GerbilSoft/rom-properties";
     license = lib.licenses.gpl2Only;
     maintainers = with lib.maintainers; [  ];
