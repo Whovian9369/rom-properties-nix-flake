@@ -21,8 +21,11 @@
   # Not really required afaik, but I like quieting the warnings :)
   pcre2,
   minizip-ng,
+  lerc,
+  libcanberra_kde,
   libselinux,
   libsepol,
+  libsysprof-capture,
   util-linux,
   inih,
 
@@ -94,9 +97,14 @@ stdenv.mkDerivation {
     cmake
     ninja
     pkg-config
+    libsysprof-capture
+      # Not really required afaik, but I like quieting the warnings :)
   ]
     # KDE 6
-    ++ lib.optionals build_kf6_plugin  [ wrapQtAppsHook ];
+    ++ lib.optionals build_kf6_plugin  [
+      wrapQtAppsHook
+      lerc.dev
+    ];
 
   buildInputs = [
     nettle
@@ -138,6 +146,7 @@ stdenv.mkDerivation {
       kio
       kwidgetsaddons
       kfilemetadata
+      libcanberra_kde
     ];
 
   /* Notes about prerequisites from upstream:
