@@ -251,22 +251,22 @@ stdenv.mkDerivation {
       ]
       # GUI Plugins
       ++ lib.optionals build_gtk3_plugin [
-        (lib.cmakeOptionType "string" "UI_FRONTENDS" "GTK3")
+        (lib.cmakeFeature "UI_FRONTENDS" "GTK3")
       ]
       ++ lib.optionals build_gtk4_plugin [
-        (lib.cmakeOptionType "string" "UI_FRONTENDS" "GTK4")
+        (lib.cmakeFeature "UI_FRONTENDS" "GTK4")
       ]
       ++ lib.optionals build_kde4_plugin [
-        (lib.cmakeOptionType "string" "UI_FRONTENDS" "KDE4")
+        (lib.cmakeFeature "UI_FRONTENDS" "KDE4")
       ]
       ++ lib.optionals build_kf5_plugin  [
-        (lib.cmakeOptionType "string" "UI_FRONTENDS" "KF5")
+        (lib.cmakeFeature "UI_FRONTENDS" "KF5")
       ]
       ++ lib.optionals build_kf6_plugin  [
-        (lib.cmakeOptionType "string" "UI_FRONTENDS" "KF6")
+        (lib.cmakeFeature "UI_FRONTENDS" "KF6")
       ]
       ++ lib.optionals build_xfce_plugin [
-        (lib.cmakeOptionType "string" "UI_FRONTENDS" "XFCE")
+        (lib.cmakeFeature "UI_FRONTENDS" "XFCE")
       ];
 
   patches = [
