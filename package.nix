@@ -75,7 +75,7 @@
 
 stdenv.mkDerivation {
   pname = "rom-properties";
-  version = "unstable-2024-11-17"
+  version = "unstable-2025-01-14"
     + lib.optionalString build_gtk3_plugin "-gtk3"
     + lib.optionalString build_gtk4_plugin "-gtk4"
     + lib.optionalString build_kde4_plugin "-kde4"
@@ -86,8 +86,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "196dfe2bb5d41049afc3b4762e4a9d58c5f87506";
-    hash = "sha256-4EyuxXdWgNw8Mj4gXbCgtgyIn5FDKJJW8hmm0ccG6gE=";
+    rev = "9adda4bf15219f7f5bb073e762b44de8b7ecc39b";
+    hash = "sha256-wS8npb1dL+DvoPloMVV/ott8Tj9+0UU5hBrIsS0ZqBc=";
   };
 
   nativeBuildInputs = [
