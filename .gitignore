@@ -1,5 +1,5 @@
 .env
 /result*
-  # Symlink for system build
+  # Symlink for program build
 /*.md
   # Notes files that aren't needed to be pushed.
