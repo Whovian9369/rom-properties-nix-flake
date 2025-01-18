@@ -30,6 +30,10 @@
   useTracker ? false,
   tracker,
 
+  # Enable AppArmor rules
+  useAppArmor ? false,
+  # libapparmor,
+
   # Build GUI Plugins
   build_xfce_plugin ? false,
   xfce, # Can't just pull xfce.tumbler directly.
@@ -66,7 +70,6 @@
   kwidgetsaddons ? null,
   kfilemetadata ? null,
   wrapQtAppsHook ? null,
-
 
 }:
 
@@ -120,6 +123,10 @@ stdenv.mkDerivation {
   ]
     # GNOME Tracker
     ++ lib.optionals useTracker [ tracker ]
+
+    # AppArmor
+    # ++ lib.optionals useAppArmor [ libapparmor ]
+
     # GUI Plugins
     ++ lib.optionals build_xfce_plugin [ gtk2 cairo gsound ]
     ++ lib.optionals build_gtk3_plugin [ gtk3 cairo gsound ]
@@ -132,9 +139,8 @@ stdenv.mkDerivation {
       kwidgetsaddons
       kfilemetadata
     ];
-  # ];
 
-  /*
+  /* Notes about prerequisites from upstream:
 
     * All:
       curl zlib libpng libjpeg-turbo nettle pkgconf tinyxml2 gettext libseccomp
@@ -154,13 +160,24 @@ stdenv.mkDerivation {
 
   separateDebugInfo = true;
 
+  /*
+    outputs = [
+    "out"
+    # "debug"
+      # Set by "separateDebugInfo = true;"?
+      # Setting it here again errors
+        # error: duplicate derivation output 'debug'
+      # It's an output, so I'm leaving it listed here.
+    ] ++ lib.optionals useAppArmor [ "apparmor" ];
+  */
+
   cmakeFlags = [
     # (lib.cmakeBool "BUILD_CLI" true)
       # Build the `rpcli` command line program.
       # Already set to `ON` in `cmake/options.cmake` so not too worried about
-        # setting it again.
+      # setting it again.
 
-    (lib.cmakeBool "INSTALL_APPARMOR" false)
+    (lib.cmakeBool "INSTALL_APPARMOR" useAppArmor)
       # Required for build since it wants to write to "/etc/apparmor.d"
       # Can I change its directory to technically include it?
       # TODO: Try to fix(?) AppArmor support
@@ -228,6 +245,10 @@ stdenv.mkDerivation {
       ++ lib.optionals useTracker [
         (lib.cmakeFeature "TRACKER_INSTALL_API_VERSION" "3")
       ]
+      # AppArmor
+      ++ lib.optionals useAppArmor [
+        (lib.cmakeFeature "DIR_INSTALL_APPARMOR" "${placeholder "out"}/etc/apparmor.d")
+      ]
       # GUI Plugins
       ++ lib.optionals build_gtk3_plugin [
         (lib.cmakeOptionType "string" "UI_FRONTENDS" "GTK3")
@@ -249,10 +270,17 @@ stdenv.mkDerivation {
       ];
 
   patches = [
-    ./patches/fix_kf6_plugindir.diff
     ./patches/fix_libexec.diff
-      # Thank you so much for the help with these, @leo60228!
-  ];
+      # Thank you for helping with this patch, @leo60228!
+  ]
+    ++ lib.optionals useAppArmor [
+      ./patches/fix_apparmor_output.diff
+    ]
+    ++ lib.optionals build_kf6_plugin [
+    ./patches/fix_kf6_plugindir.diff
+      # Fix plugin path by removing logic to automatically find it.
+      # Thank you for helping with this patch, @leo60228!
+    ];
 
   /*
     About used patches:
@@ -261,9 +289,28 @@ stdenv.mkDerivation {
         path instead of doing it manually.
         (Technically it's a Qt thing and not KDE, but this is for KDE so...)
 
-
       `fix_libexec.diff` fixes where `result/lib/libromdata.so.5.0` looks for
         `rp-download` at runtime. Seems to mainly affect use of the GUI plugin.
+  */
+
+  postInstall = lib.optionals useAppArmor ''
+    mv "$out/etc/apparmor.d/"*rp-download "$out/etc/apparmor.d/bin.rp-download"
+    echo "Moved profile for rp-download"
+    # mv "$out/etc/apparmor.d/"*rpcli "$out/etc/apparmor.d/bin.rpcli"
+    # echo "Moved profile for rpcli"
+  '';
+  /*
+    postInstall = lib.optionals useAppArmor ''
+      mv "$out/etc/apparmor.d/"*rpcli "$out/etc/apparmor.d/bin.rpcli"
+      echo "Moved profile for rpcli"
+    '';
+    # For some reason there isn't an `rpcli` file copied over by `INSTALL_APPARMOR`?
+
+    $  fd --type=f apparmor
+    src/rp-download/rp-download.apparmor.conf
+    src/rpcli/rpcli.apparmor.conf
+    src/rpcli/rpcli.local.apparmor.conf
+      # Likely unneeded?
   */
 
   meta = {

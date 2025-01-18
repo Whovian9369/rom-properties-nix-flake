@@ -1,0 +1,13 @@
+diff --git a/cmake/macros/DirInstallPaths.cmake b/cmake/macros/DirInstallPaths.cmake
+index ba4e1fdf1..d05d0c35e 100644
+--- a/cmake/macros/DirInstallPaths.cmake
++++ b/cmake/macros/DirInstallPaths.cmake
+@@ -80,7 +80,7 @@ IF(UNIX AND NOT APPLE)
+ 	ENDIF(ENABLE_NIXOS)
+ 
+ 	# AppArmor profile directory
+-	SET(DIR_INSTALL_APPARMOR "/etc/apparmor.d")
++	SET(DIR_INSTALL_APPARMOR "/etc/apparmor.d" CACHE STRING "AppArmor output directory")
+ ELSEIF(APPLE)
+ 	# Mac OS X-style install paths.
+ 	# Install should be relative to the application bundle.
