@@ -23,7 +23,7 @@
       rp_gtk4 = pkgs.callPackage ./package.nix { build_gtk4_plugin = true; };
       rp_kde4 = pkgs.callPackage ./package.nix { build_kde4_plugin = true; };
       rp_kde5 = pkgs.callPackage ./package.nix { build_kf5_plugin = true; };
-      rp_kde6 = pkgs.qt6Packages.callPackage ./package.nix { build_kf6_plugin = true; };
+      rp_kde6 = pkgs.kdePackages.callPackage ./package.nix { build_kf6_plugin = true; };
     };
   };
 }
