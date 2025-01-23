@@ -73,7 +73,6 @@
   kwidgetsaddons ? null,
   kfilemetadata ? null,
   wrapQtAppsHook ? null,
-
 }:
 
 stdenv.mkDerivation {
@@ -97,8 +96,6 @@ stdenv.mkDerivation {
     cmake
     ninja
     pkg-config
-    libsysprof-capture
-      # Not really required afaik, but I like quieting the warnings :)
   ]
     # KDE 6
     ++ lib.optionals build_kf6_plugin  [
@@ -128,6 +125,8 @@ stdenv.mkDerivation {
     gtk3
     xfce.tumbler
     gsound
+    libsysprof-capture
+      # Not really required afaik, but I like quieting the warnings :)
   ]
     # GNOME Tracker
     ++ lib.optionals useTracker [ tracker ]
@@ -165,20 +164,26 @@ stdenv.mkDerivation {
 
     * GNOME, MATE, Cinnamon:
       glib2 gtk3 cairo libnautilus-extension gsound
+
+    ===========================================================================
+
+    src/libunixcommon/dll-search.c:
+    ```
+    // Supported rom-properties frontends.
+    typedef enum {
+      RP_FE_KDE4,
+      RP_FE_KF5,
+      RP_FE_KF6,
+      RP_FE_GTK2, // XFCE (Thunar 1.6)
+      RP_FE_GTK3, // GNOME, MATE, Cinnamon, XFCE (Thunar 1.8)
+      RP_FE_GTK4, // GNOME 43
+
+      RP_FE_MAX
+    } RP_Frontend;
+    ```
   */
 
   separateDebugInfo = true;
-
-  /*
-    outputs = [
-    "out"
-    # "debug"
-      # Set by "separateDebugInfo = true;"?
-      # Setting it here again errors
-        # error: duplicate derivation output 'debug'
-      # It's an output, so I'm leaving it listed here.
-    ] ++ lib.optionals useAppArmor [ "apparmor" ];
-  */
 
   cmakeFlags = [
     # (lib.cmakeBool "BUILD_CLI" true)
@@ -223,20 +228,21 @@ stdenv.mkDerivation {
       # Should prevent duplicate entries in .#default.debug.outpath .
     (lib.cmakeBool "INSTALL_DEBUG" false)
       # Install the split debug files, if those are enabled via "SPLIT_DEBUG".
-
     (lib.cmakeBool "ENABLE_NIXOS" true)
       # Special handling for NixOS
-        # Basically a hack to fix two issues I had made patches for before
-        # reporting the issues upstream.
+      /*
+        Basically a hack to fix two issues I had made patches for before
+        reporting the issues upstream.
 
-        # Due to odd path issues, debug file paths were seemingly duplicated
-        # multiple times in the output path.
+        Due to odd path issues, debug file paths were seemingly duplicated
+        multiple times in the output path.
 
-        # There's also a fix for system calls used, but only appears to be
-        # required on NixOS?
+        There's also a fix for system calls used, but only appears to be
+        required on NixOS?
 
-        # Specifics can be found at
-        # https://github.com/GerbilSoft/rom-properties/commit/adc780f1138a1450fcf98e183253d2a3fa3ce46a
+        Specifics can be found at
+        https://github.com/GerbilSoft/rom-properties/commit/adc780f1138a1450fcf98e183253d2a3fa3ce46a
+      */
 
     /*
       # Flags enabled when on Windows
@@ -273,6 +279,9 @@ stdenv.mkDerivation {
       ]
       ++ lib.optionals build_kf6_plugin  [
         (lib.cmakeFeature "UI_FRONTENDS" "KF6")
+        (lib.cmakeFeature "QT_MAJOR_VERSION" "6")
+          # Prevents build from trying to force use of QT5 dev libraries
+          # ... For some reason?
       ]
       ++ lib.optionals build_xfce_plugin [
         (lib.cmakeFeature "UI_FRONTENDS" "XFCE")
@@ -286,20 +295,21 @@ stdenv.mkDerivation {
       ./patches/fix_apparmor_output.diff
     ]
     ++ lib.optionals build_kf6_plugin [
-    ./patches/fix_kf6_plugindir.diff
-      # Fix plugin path by removing logic to automatically find it.
-      # Thank you for helping with this patch, @leo60228!
+      ./patches/fix_kf6_plugindir.diff
+        # Fix plugin path by removing logic to automatically find it.
+        # Thank you for helping with this patch, @leo60228!
     ];
 
   /*
     About used patches:
+      `fix_libexec.diff` fixes where `result/lib/libromdata.so.5.0` looks for
+        `rp-download` at runtime. Seems to mainly affect use of the GUI plugin.
+
       `fix_kf6_plugindir.diff` fixes the KDE 6 plugin path.
         Makes the build use KDE's `cmake` logic for finding the plugin install
         path instead of doing it manually.
         (Technically it's a Qt thing and not KDE, but this is for KDE so...)
 
-      `fix_libexec.diff` fixes where `result/lib/libromdata.so.5.0` looks for
-        `rp-download` at runtime. Seems to mainly affect use of the GUI plugin.
   */
 
   postInstall = lib.optionals useAppArmor ''
