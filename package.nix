@@ -317,22 +317,22 @@ stdenv.mkDerivation {
 
   postInstall = lib.optionals useAppArmor ''
     mv "$out/etc/apparmor.d/"*rp-download "$out/etc/apparmor.d/bin.rp-download"
-    echo "Moved profile for rp-download"
-    # mv "$out/etc/apparmor.d/"*rpcli "$out/etc/apparmor.d/bin.rpcli"
-    # echo "Moved profile for rpcli"
   '';
   /*
-    postInstall = lib.optionals useAppArmor ''
-      mv "$out/etc/apparmor.d/"*rpcli "$out/etc/apparmor.d/bin.rpcli"
-      echo "Moved profile for rpcli"
-    '';
-    # For some reason there isn't an `rpcli` file copied over by `INSTALL_APPARMOR`?
+    `mv` required to properly(?) set filename for AppArmor Profile instead of
+    the default filename, which included the full nix store path (with full
+    stops instead of slashes as path delimiters.) and thus shouldn't be included
+    as part of the build. Besides, I don't think that the original (full path)
+    filename wouldn't actually work for AppArmor reasons? I'm not sure, but it
+    seems like the smartest idea for me to change it.
 
-    $  fd --type=f apparmor
-    src/rp-download/rp-download.apparmor.conf
-    src/rpcli/rpcli.apparmor.conf
-    src/rpcli/rpcli.local.apparmor.conf
-      # Likely unneeded?
+    Commit from 2024-03-01 disables the AppArmor rules for `rpcli`
+    Supposedly due to the rules possibly blocking proper use in the user's
+    `$HOME` directory.
+    "It's not allowing writes to the user's home directory, which prevents
+      extracting images."
+    More information can be found on the relevant commit message.
+    GerbilSoft/rom-properties/commit/ff6c90736d1d598be54bafccb12f590e0ff3e905
   */
 
   meta = {
