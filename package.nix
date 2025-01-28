@@ -300,16 +300,19 @@ stdenv.mkDerivation {
         # Thank you for helping with this patch, @leo60228!
     ];
 
-  /*
-    About used patches:
-      `fix_libexec.diff` fixes where `result/lib/libromdata.so.5.0` looks for
-        `rp-download` at runtime. Seems to mainly affect use of the GUI plugin.
+  /* About used patches:
+    `fix_libexec.diff` fixes where `result/lib/libromdata.so.5.0` looks for
+      `rp-download` at runtime. Seems to mainly affect use of the GUI plugin.
 
-      `fix_kf6_plugindir.diff` fixes the KDE 6 plugin path.
-        Makes the build use KDE's `cmake` logic for finding the plugin install
-        path instead of doing it manually.
-        (Technically it's a Qt thing and not KDE, but this is for KDE so...)
+    `fix_apparmor_output.diff` lets us override the default output directory
+      for AppArmor profiles. This makes it so the build process doesn't try to
+      write to an FHS-only directory, and makes it more follow (with the help of
+      a CMake flag) the suggested Nix packaging style.
 
+    `fix_kf6_plugindir.diff` fixes the KDE 6 plugin path.
+      Makes the build use KDE's `cmake` logic for finding the plugin install
+      path instead of doing it manually.
+      (Technically it's a Qt thing and not KDE, but this is for KDE so...)
   */
 
   postInstall = lib.optionals useAppArmor ''
