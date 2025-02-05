@@ -38,46 +38,49 @@
   # libapparmor,
 
   # Build GUI Plugins
+  ## Pre-requisites for multiple plugins
+
+  # XFCE (XFCE, GTK 3.x, and GTK 4.x)
+  xfce ? null,
+    # Can't just pull xfce.tumbler directly.
+  cairo ? null,
+  gsound ? null,
+
+
   build_xfce_plugin ? false,
-  xfce, # Can't just pull xfce.tumbler directly.
   gtk2,
-  cairo,
-  gsound,
 
   ## XFCE (GTK+ 3.x)
   build_gtk3_plugin ? false,
   gtk3,
-  # xfce, # Can't just pull xfce.tumbler directly.
-  # cairo,
-  # gsound,
 
   ## XFCE (GTK+ 4.x)?
   build_gtk4_plugin ? false,
   gtk4,
-  # xfce, # Can't just pull xfce.tumbler directly.
-  # cairo,
-  # gsound,
 
+  ## KDE4
   build_kde4_plugin ? false,
-  # KDE4
 
 
+  ## KDE5
   build_kf5_plugin ? false,
-  # KDE5
+  qt5 ? null,
+  libsForQt5 ? null,
+  extra-cmake-modules ? null,
 
-
+  ## KDE6
   build_kf6_plugin ? false,
-  # KDE6
-  qtbase ? null,
+  qt6 ? null,
   kio ? null,
   kwidgetsaddons ? null,
   kfilemetadata ? null,
-  wrapQtAppsHook ? null,
+  # wrapQtAppsHook ? null,
+  fmt ? null,
 }:
 
 stdenv.mkDerivation {
   pname = "rom-properties";
-  version = "unstable-2025-01-14"
+  version = "unstable-2025-02-04"
     + lib.optionalString build_gtk3_plugin "-gtk3"
     + lib.optionalString build_gtk4_plugin "-gtk4"
     + lib.optionalString build_kde4_plugin "-kde4"
@@ -88,19 +91,26 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "9adda4bf15219f7f5bb073e762b44de8b7ecc39b";
-    hash = "sha256-wS8npb1dL+DvoPloMVV/ott8Tj9+0UU5hBrIsS0ZqBc=";
+    rev = "c1e8b097da0b37d89547e4b898b031f6e3e371a4";
+    hash = "sha256-DH+TY/azzUQK+EhJnrwuSimgCkQ4WtRIiReqFxsJqwA=";
   };
+
+  dontWrapQtApps = true;
 
   nativeBuildInputs = [
     cmake
     ninja
     pkg-config
   ]
+    # KDE 5
+    ++ lib.optionals build_kf5_plugin  [
+      lerc.dev
+      extra-cmake-modules
+    ]
     # KDE 6
     ++ lib.optionals build_kf6_plugin  [
-      wrapQtAppsHook
       lerc.dev
+      # extra-cmake-modules
     ];
 
   buildInputs = [
@@ -139,13 +149,22 @@ stdenv.mkDerivation {
     ++ lib.optionals build_gtk3_plugin [ gtk3 cairo gsound ]
     ++ lib.optionals build_gtk4_plugin [ gtk4 cairo gsound ]
     ++ lib.optionals build_kde4_plugin [ ]
-    ++ lib.optionals build_kf5_plugin  [ ]
+    ++ lib.optionals build_kf5_plugin  [
+      libsForQt5.qt5.qtbase
+      libsForQt5.kwidgetsaddons
+      libsForQt5.kio
+      libsForQt5.kfilemetadata
+        # Error: detected mismatched Qt dependencies
+      libcanberra_kde
+      fmt
+    ]
     ++ lib.optionals build_kf6_plugin  [
-      qtbase
+      qt6.qtbase
       kio
       kwidgetsaddons
       kfilemetadata
       libcanberra_kde
+      fmt
     ];
 
   /* Notes about prerequisites from upstream:
@@ -187,9 +206,11 @@ stdenv.mkDerivation {
 
   cmakeFlags = [
     # (lib.cmakeBool "BUILD_CLI" true)
-      # Build the `rpcli` command line program.
-      # Already set to `ON` in `cmake/options.cmake` so not too worried about
-      # setting it again.
+    /*
+      Build the `rpcli` command line program.
+      Already set to `ON` in `cmake/options.cmake` so not too worried about
+      setting it again.
+    */
 
     (lib.cmakeBool "INSTALL_APPARMOR" useAppArmor)
       # Required for build since it wants to write to "/etc/apparmor.d"
@@ -276,6 +297,7 @@ stdenv.mkDerivation {
       ]
       ++ lib.optionals build_kf5_plugin  [
         (lib.cmakeFeature "UI_FRONTENDS" "KF5")
+        (lib.cmakeFeature "QT_MAJOR_VERSION" "5")
       ]
       ++ lib.optionals build_kf6_plugin  [
         (lib.cmakeFeature "UI_FRONTENDS" "KF6")
@@ -294,10 +316,18 @@ stdenv.mkDerivation {
     ++ lib.optionals useAppArmor [
       ./patches/fix_apparmor_output.diff
     ]
+
     ++ lib.optionals build_kf6_plugin [
       ./patches/fix_kf6_plugindir.diff
         # Fix plugin path by removing logic to automatically find it.
         # Thank you for helping with this patch, @leo60228!
+    ]
+
+    ++ lib.optionals build_kf5_plugin [
+      ./patches/fix_kf5_plugindir.diff
+        # Fix plugin path by removing logic to automatically find it.
+        # Based on fix_kf6_plugindir.diff that @leo60228 originally added, so
+        # thank you to leo!
     ];
 
   /* About used patches:
