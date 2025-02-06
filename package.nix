@@ -31,7 +31,7 @@
 
   # Enable GNOME "Tracker".
   useTracker ? false,
-  tracker,
+  tinysparql,
 
   # Enable AppArmor rules
   useAppArmor ? false,
@@ -39,28 +39,25 @@
 
   # Build GUI Plugins
   ## Pre-requisites for multiple plugins
+  fmt ? null,
 
-  # XFCE (XFCE, GTK 3.x, and GTK 4.x)
+  # XFCE (GTK 2.x, GTK 3.x, and GTK 4.x)
+  # build_xfce_plugin ? false,
+  # gtk2 ? null,
+
+  ## XFCE (GTK+ 3.x)
+  build_gtk3_plugin ? false,
+  gtk3 ? null,
   xfce ? null,
     # Can't just pull xfce.tumbler directly.
   cairo ? null,
   gsound ? null,
-
-
-  build_xfce_plugin ? false,
-  gtk2,
-
-  ## XFCE (GTK+ 3.x)
-  build_gtk3_plugin ? false,
-  gtk3,
+  libcanberra-gtk3 ? null,
+  gobject-introspection ? null,
 
   ## XFCE (GTK+ 4.x)?
   build_gtk4_plugin ? false,
-  gtk4,
-
-  ## KDE4
-  build_kde4_plugin ? false,
-
+  gtk4 ? null,
 
   ## KDE5
   build_kf5_plugin ? false,
@@ -75,7 +72,6 @@
   kwidgetsaddons ? null,
   kfilemetadata ? null,
   # wrapQtAppsHook ? null,
-  fmt ? null,
 }:
 
 stdenv.mkDerivation {
@@ -83,10 +79,10 @@ stdenv.mkDerivation {
   version = "unstable-2025-02-04"
     + lib.optionalString build_gtk3_plugin "-gtk3"
     + lib.optionalString build_gtk4_plugin "-gtk4"
-    + lib.optionalString build_kde4_plugin "-kde4"
     + lib.optionalString build_kf5_plugin  "-kde5"
     + lib.optionalString build_kf6_plugin  "-kde6"
-    + lib.optionalString build_xfce_plugin "-xfce";
+    # + lib.optionalString build_xfce_plugin "-xfce"
+    ;
 
   src = fetchFromGitHub {
     owner = "GerbilSoft";
@@ -97,11 +93,21 @@ stdenv.mkDerivation {
 
   dontWrapQtApps = true;
 
+  preConfigure = lib.optionals build_gtk3_plugin ''
+    mkdir -p ${placeholder "out"}/lib/glib-2.0/include
+  '';
+
   nativeBuildInputs = [
     cmake
     ninja
     pkg-config
   ]
+    # GTK 3 - GNOME, MATE, Cinnamon, and XFCE
+    ++ lib.optionals build_gtk3_plugin  [
+      lerc.dev
+      extra-cmake-modules
+      gobject-introspection
+    ]
     # KDE 5
     ++ lib.optionals build_kf5_plugin  [
       lerc.dev
@@ -110,7 +116,7 @@ stdenv.mkDerivation {
     # KDE 6
     ++ lib.optionals build_kf6_plugin  [
       lerc.dev
-      # extra-cmake-modules
+      extra-cmake-modules
     ];
 
   buildInputs = [
@@ -137,18 +143,26 @@ stdenv.mkDerivation {
     gsound
     libsysprof-capture
       # Not really required afaik, but I like quieting the warnings :)
+    fmt
   ]
     # GNOME Tracker
-    ++ lib.optionals useTracker [ tracker ]
+    ++ lib.optionals useTracker [ tinysparql ]
 
     # AppArmor
     # ++ lib.optionals useAppArmor [ libapparmor ]
 
     # GUI Plugins
-    ++ lib.optionals build_xfce_plugin [ gtk2 cairo gsound ]
-    ++ lib.optionals build_gtk3_plugin [ gtk3 cairo gsound ]
+    # ++ lib.optionals build_xfce_plugin [ gtk2 cairo gsound ]
+    ++ lib.optionals build_gtk3_plugin [
+      # Also has useTracker set, so uses pkgs.tinysparql
+      cairo
+      gsound
+      xfce.tumbler.dev
+      xfce.thunar.dev
+      gtk3.dev
+      libcanberra-gtk3
+    ]
     ++ lib.optionals build_gtk4_plugin [ gtk4 cairo gsound ]
-    ++ lib.optionals build_kde4_plugin [ ]
     ++ lib.optionals build_kf5_plugin  [
       libsForQt5.qt5.qtbase
       libsForQt5.kwidgetsaddons
@@ -156,7 +170,6 @@ stdenv.mkDerivation {
       libsForQt5.kfilemetadata
         # Error: detected mismatched Qt dependencies
       libcanberra_kde
-      fmt
     ]
     ++ lib.optionals build_kf6_plugin  [
       qt6.qtbase
@@ -164,7 +177,6 @@ stdenv.mkDerivation {
       kwidgetsaddons
       kfilemetadata
       libcanberra_kde
-      fmt
     ];
 
   /* Notes about prerequisites from upstream:
@@ -275,39 +287,43 @@ stdenv.mkDerivation {
       (lib.cmakeBool "USE_INTERNAL_LZ4" false)
       (lib.cmakeBool "USE_INTERNAL_LZO" false)
     */
-
+  ]
+    # GNOME Tracker
+    ++ lib.optionals useTracker [
+      (lib.cmakeFeature "TRACKER_INSTALL_API_VERSION" "3")
     ]
-      # GNOME Tracker
-      ++ lib.optionals useTracker [
-        (lib.cmakeFeature "TRACKER_INSTALL_API_VERSION" "3")
-      ]
-      # AppArmor
-      ++ lib.optionals useAppArmor [
-        (lib.cmakeFeature "DIR_INSTALL_APPARMOR" "${placeholder "out"}/etc/apparmor.d")
-      ]
-      # GUI Plugins
-      ++ lib.optionals build_gtk3_plugin [
-        (lib.cmakeFeature "UI_FRONTENDS" "GTK3")
-      ]
-      ++ lib.optionals build_gtk4_plugin [
-        (lib.cmakeFeature "UI_FRONTENDS" "GTK4")
-      ]
-      ++ lib.optionals build_kde4_plugin [
-        (lib.cmakeFeature "UI_FRONTENDS" "KDE4")
-      ]
-      ++ lib.optionals build_kf5_plugin  [
-        (lib.cmakeFeature "UI_FRONTENDS" "KF5")
-        (lib.cmakeFeature "QT_MAJOR_VERSION" "5")
-      ]
-      ++ lib.optionals build_kf6_plugin  [
-        (lib.cmakeFeature "UI_FRONTENDS" "KF6")
-        (lib.cmakeFeature "QT_MAJOR_VERSION" "6")
-          # Prevents build from trying to force use of QT5 dev libraries
-          # ... For some reason?
-      ]
-      ++ lib.optionals build_xfce_plugin [
-        (lib.cmakeFeature "UI_FRONTENDS" "XFCE")
-      ];
+    # AppArmor
+    ++ lib.optionals useAppArmor [
+      (lib.cmakeFeature "DIR_INSTALL_APPARMOR" "${placeholder "out"}/etc/apparmor.d")
+    ]
+    # GUI Plugins
+    ++ lib.optionals build_gtk3_plugin [
+      (lib.cmakeFeature "UI_FRONTENDS" "GTK3")
+      (lib.cmakeFeature "GTK3_GLIBCONFIG_INCLUDE_DIR" "${placeholder "out"}/lib/glib-2.0/include")
+    ]
+    ++ lib.optionals build_gtk4_plugin [
+      (lib.cmakeFeature "UI_FRONTENDS" "GTK4")
+    ]
+    /*
+    ++ lib.optionals build_kde4_plugin [
+      (lib.cmakeFeature "UI_FRONTENDS" "KDE4")
+    ]
+    */
+    ++ lib.optionals build_kf5_plugin  [
+      (lib.cmakeFeature "UI_FRONTENDS" "KF5")
+      (lib.cmakeFeature "QT_MAJOR_VERSION" "5")
+    ]
+    ++ lib.optionals build_kf6_plugin  [
+      (lib.cmakeFeature "UI_FRONTENDS" "KF6")
+      (lib.cmakeFeature "QT_MAJOR_VERSION" "6")
+        # Prevents build from trying to force use of QT5 dev libraries
+        # ... For some reason?
+    /*
+    ]
+    ++ lib.optionals build_xfce_plugin [
+      (lib.cmakeFeature "UI_FRONTENDS" "XFCE")
+    */
+    ];
 
   patches = [
     ./patches/fix_libexec.diff
@@ -315,6 +331,11 @@ stdenv.mkDerivation {
   ]
     ++ lib.optionals useAppArmor [
       ./patches/fix_apparmor_output.diff
+    ]
+
+    ++ lib.optionals build_gtk3_plugin [
+      ./patches/fix_gtk3_plugindir.diff
+        # Fix plugin path to not include the full path to $out
     ]
 
     ++ lib.optionals build_kf6_plugin [
@@ -369,10 +390,11 @@ stdenv.mkDerivation {
     description = "ROM Properties Page shell extension"
       + lib.optionalString build_gtk3_plugin " (GTK3)"
       + lib.optionalString build_gtk4_plugin " (GTK4)"
-      + lib.optionalString build_kde4_plugin " (KDE4)"
+      # + lib.optionalString build_kde4_plugin " (KDE4)"
       + lib.optionalString build_kf5_plugin  " (KDE5)"
       + lib.optionalString build_kf6_plugin  " (KDE6)"
-      + lib.optionalString build_xfce_plugin " (XFCE)";
+      # + lib.optionalString build_xfce_plugin " (XFCE)"
+      ;
 
     homepage = "https://github.com/GerbilSoft/rom-properties";
     license = lib.licenses.gpl2Only;

@@ -1,0 +1,39 @@
+diff --git a/src/gtk/gtk3/CMakeLists.txt b/src/gtk/gtk3/CMakeLists.txt
+index bd300b589..39459f8e7 100644
+--- a/src/gtk/gtk3/CMakeLists.txt
++++ b/src/gtk/gtk3/CMakeLists.txt
+@@ -31,7 +31,7 @@ IF(GLib2_FOUND AND GObject2_FOUND AND GIO_FOUND AND GIO-UNIX_FOUND AND CairoGObj
+ 		ELSE(LibNautilusExtension4_FOUND)
+ 			# Neither v3 nor v4 were found.
+ 			MESSAGE(STATUS "LibNautilusExtension not found. Using the default extensions directory.")
+-			SET(LibNautilusExtension3_EXTENSION_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/nautilus/extensions-3.0")
++			SET(LibNautilusExtension3_EXTENSION_DIR "${CMAKE_INSTALL_LIBDIR}/nautilus/extensions-3.0")
+ 		ENDIF(LibNautilusExtension4_FOUND)
+ 	ENDIF(LibNautilusExtension_FOUND)
+ 
+@@ -41,7 +41,7 @@ IF(GLib2_FOUND AND GObject2_FOUND AND GIO_FOUND AND GIO-UNIX_FOUND AND CairoGObj
+ 		SET(LibCajaExtension3_EXTENSION_DIR "${LibCajaExtension_EXTENSION_DIR}")
+ 	ELSE(LibCajaExtension_FOUND)
+ 		MESSAGE(STATUS "LibCajaExtension not found. Using the default extensions directory.")
+-		SET(LibCajaExtension3_EXTENSION_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/caja/extensions-2.0")
++		SET(LibCajaExtension3_EXTENSION_DIR "${CMAKE_INSTALL_LIBDIR}/caja/extensions-2.0")
+ 	ENDIF(LibCajaExtension_FOUND)
+ 
+ 	# Nemo (Cinnamon)
+@@ -50,14 +50,14 @@ IF(GLib2_FOUND AND GObject2_FOUND AND GIO_FOUND AND GIO-UNIX_FOUND AND CairoGObj
+ 		SET(LibNemoExtension3_EXTENSION_DIR "${LibNemoExtension_EXTENSION_DIR}")
+ 	ELSE(LibNemoExtension_FOUND)
+ 		MESSAGE(STATUS "LibNemoExtension not found. Using the default extensions directory.")
+-		SET(LibNemoExtension3_EXTENSION_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/nemo/extensions-3.0")
++		SET(LibNemoExtension3_EXTENSION_DIR "${CMAKE_INSTALL_LIBDIR}/nemo/extensions-3.0")
+ 	ENDIF(LibNemoExtension_FOUND)
+ 
+ 	# ThunarX3 (XFCE)
+ 	FIND_PACKAGE(ThunarX3)
+ 	IF(NOT ThunarX3_FOUND)
+ 		MESSAGE(STATUS "ThunarX3 not found. Using the default extensions directory.")
+-		SET(ThunarX3_EXTENSIONS_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/thunarx-3")
++		SET(ThunarX3_EXTENSIONS_DIR "${CMAKE_INSTALL_LIBDIR}/thunarx-3")
+ 	ENDIF(NOT ThunarX3_FOUND)
+ ELSE()
+ 	# GTK+ 3.x (or required dependencies) were not found.
