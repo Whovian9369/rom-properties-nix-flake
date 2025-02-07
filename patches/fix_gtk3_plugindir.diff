@@ -37,3 +37,27 @@ index bd300b589..39459f8e7 100644
  	ENDIF(NOT ThunarX3_FOUND)
  ELSE()
  	# GTK+ 3.x (or required dependencies) were not found.
+diff --git a/src/libunixcommon/CMakeLists.txt b/src/libunixcommon/CMakeLists.txt
+index fc0f54bc7..d583f2011 100644
+--- a/src/libunixcommon/CMakeLists.txt
++++ b/src/libunixcommon/CMakeLists.txt
+@@ -21,7 +21,7 @@ IF(BUILD_XFCE)
+ 	# Thunar (XFCE)
+ 	FIND_PACKAGE(ThunarX2)
+ 	IF(NOT ThunarX2_FOUND)
+-		SET(ThunarX2_EXTENSIONS_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/thunarx-2")
++		SET(ThunarX2_EXTENSIONS_DIR "${CMAKE_INSTALL_LIBDIR}/thunarx-2")
+ 	ENDIF(NOT ThunarX2_FOUND)
+ ENDIF(BUILD_XFCE)
+ IF(BUILD_GTK3 OR BUILD_GTK4)
+@@ -40,8 +40,8 @@ IF(BUILD_GTK3 OR BUILD_GTK4)
+ 	ELSE()
+ 		# Neither v3 nor v4 were found.
+ 		MESSAGE(STATUS "LibNautilusExtension not found. Using the default extensions directory.")
+-		SET(LibNautilusExtension3_EXTENSION_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/nautilus/extensions-3.0")
+-		SET(LibNautilusExtension4_EXTENSION_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/nautilus/extensions-4")
++		SET(LibNautilusExtension3_EXTENSION_DIR "${CMAKE_INSTALL_LIBDIR}/nautilus/extensions-3.0")
++		SET(LibNautilusExtension4_EXTENSION_DIR "${CMAKE_INSTALL_LIBDIR}/nautilus/extensions-4")
+ 	ENDIF()
+ ENDIF(BUILD_GTK3 OR BUILD_GTK4)
+ 
