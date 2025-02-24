@@ -54,6 +54,7 @@
   gsound ? null,
   libcanberra-gtk3 ? null,
   gobject-introspection ? null,
+  pango ? null,
 
   ## XFCE (GTK+ 4.x)?
   build_gtk4_plugin ? false,
@@ -81,14 +82,13 @@ stdenv.mkDerivation {
     + lib.optionalString build_gtk4_plugin "-gtk4"
     + lib.optionalString build_kf5_plugin  "-kde5"
     + lib.optionalString build_kf6_plugin  "-kde6"
-    # + lib.optionalString build_xfce_plugin "-xfce"
     ;
 
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "c1e8b097da0b37d89547e4b898b031f6e3e371a4";
-    hash = "sha256-DH+TY/azzUQK+EhJnrwuSimgCkQ4WtRIiReqFxsJqwA=";
+    rev = "6c58b9d74b388e6ad02c627ef263e4a160ad3c3b";
+    hash = "sha256-STGPmHRn2c4fwSjyl2qkpeb7HXacNDpREi9+uScJV9s=";
   };
 
   dontWrapQtApps = true;
@@ -97,12 +97,52 @@ stdenv.mkDerivation {
     mkdir -p ${placeholder "out"}/lib/glib-2.0/include
   '';
 
+  # Plugin Coverage notes:
+    # GTK 3 - MATE, Cinnamon, and XFCE
+      /*
+        MATE (Caja):
+          - Thumbnails
+          - Has "Properties" tab
+
+        Cinnamon (Nemo):
+          - Thumbnails
+          - No "Properties" tab
+
+        XFCE (Thunar):
+          - Thumbnails
+          - Has "Properties" tab
+      */
+
+    # GTK 4 - GNOME
+      /*
+        GNOME (Nautilus)
+          - Notes to self:
+            - Uses "$out/lib/nautilus/extensions-4" for plugins
+              - nixpkgs:/nixos/modules/services/x11/desktop-managers/gnome.nix
+            - Check out pkgs/desktops/gnome/extensions/buildGnomeExtension.nix
+          - ?
+          - ?
+      */
+
+    # KDE 5 / Plasma 5
+      /*
+        Plasma 5:
+          - Thumbnails
+          - Has "Properties" tab
+      */
+
+    # KDE 6 / Plasma 6
+      /*
+        Plasma 6:
+          - Thumbnails
+          - Has "Properties" tab
+      */
+
   nativeBuildInputs = [
     cmake
     ninja
     pkg-config
   ]
-    # GTK 3 - GNOME, MATE, Cinnamon, and XFCE
     ++ lib.optionals build_gtk3_plugin  [
       lerc.dev
       extra-cmake-modules
@@ -126,7 +166,8 @@ stdenv.mkDerivation {
     libsepol
     pcre2
     util-linux
-    curl
+    # curl
+    curl.dev
     libjpeg
     libpng
     libseccomp
@@ -161,14 +202,18 @@ stdenv.mkDerivation {
       xfce.thunar.dev
       gtk3.dev
       libcanberra-gtk3
+      pango.dev
     ]
-    ++ lib.optionals build_gtk4_plugin [ gtk4 cairo gsound ]
+    ++ lib.optionals build_gtk4_plugin [
+      gtk4
+      cairo
+      gsound
+    ]
     ++ lib.optionals build_kf5_plugin  [
       libsForQt5.qt5.qtbase
       libsForQt5.kwidgetsaddons
       libsForQt5.kio
       libsForQt5.kfilemetadata
-        # Error: detected mismatched Qt dependencies
       libcanberra_kde
     ]
     ++ lib.optionals build_kf6_plugin  [
@@ -181,20 +226,17 @@ stdenv.mkDerivation {
 
   /* Notes about prerequisites from upstream:
 
-    * All:
-      curl zlib libpng libjpeg-turbo nettle pkgconf tinyxml2 gettext libseccomp
-
-    * Optional decompression:
-      zstd lz4 lzo
-
-    * KDE 5.x:
-      qt5-base qt5-tools extra-cmake-modules kio kwidgetsaddons kfilemetadata
-
-    * XFCE (GTK+ 3.x):
-      glib2 gtk3 cairo gsound
-
-    * GNOME, MATE, Cinnamon:
-      glib2 gtk3 cairo libnautilus-extension gsound
+    On Debian/Ubuntu, you will need build-essential and the following development
+    packages:
+    * All: cmake libcurl-dev zlib1g-dev libpng-dev libjpeg-dev nettle-dev pkg-config libtinyxml2-dev gettext libseccomp-dev libfmt-dev
+    * Optional decompression: libzstd-dev liblz4-dev liblzo2-dev
+    * KDE 4.x: libqt4-dev kdelibs5-dev
+    * KDE 5.x: qtbase5-dev qttools5-dev-tools extra-cmake-modules libkf5kio-dev libkf5widgetsaddons-dev libkf5filemetadata-dev libkf5crash-dev
+    * KDE 6.x: qt6-base-dev qt6-tools-dev-tools extra-cmake-modules libkf6kio-dev libkf6widgetsaddons-dev libkf6filemetadata-dev libkf6crash-dev
+    * XFCE (GTK+ 2.x): libglib2.0-dev libgtk2.0-dev libgdk-pixbuf2.0-dev libthunarx-2-dev libcanberra-dev libgsound-dev
+    * XFCE (GTK+ 3.x): libglib2.0-dev libgtk-3-dev libcairo2-dev libthunarx-3-dev libgsound-dev
+    * GNOME, MATE, Cinnamon: libglib2.0-dev libgtk-3-dev libcairo2-dev libnautilus-extension-dev libgsound-dev
+    * GNOME 43: libglib2.0-dev libgtk-4-dev libgdk-pixbuf2.0-dev libnautilus-extension-dev libgsound-dev
 
     ===========================================================================
 
