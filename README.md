@@ -7,9 +7,6 @@ There are also alternate versions available and exposed by this flake for use wi
 - KDE 6.x
   - `rp_kde6` can be built by using `nix build github:Whovian9369/rom-properties-nix-flake#rp_kde6`
 
-- XFCE (GTK 2)
-  - Currently unavailable.
-  - `rp_gtk2` can be built by using `nix build github:Whovian9369/rom-properties-nix-flake#rp_gtk2`
 - Cinnamon, GNOME, MATE (1.18+), XFCE, and Unity (GTK 3)
   - Currently unavailable.
   - `rp_gtk3` can be built by using `nix build github:Whovian9369/rom-properties-nix-flake#rp_gtk3`
