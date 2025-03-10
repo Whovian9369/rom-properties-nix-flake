@@ -4,7 +4,7 @@ You should be able to build this by running `nix build github:Whovian9369/rom-pr
 
 There are also alternate versions available and exposed by this flake for use with various Desktop Environments, including but not limited to:
 
-- KDE 6.x
+- Plasma/KDE 6.x
   - `rp_kde6` can be built by using `nix build github:Whovian9369/rom-properties-nix-flake#rp_kde6`
 
 - Cinnamon, GNOME, MATE (1.18+), XFCE, and Unity (GTK 3)
@@ -16,7 +16,7 @@ There are also alternate versions available and exposed by this flake for use wi
 - KDE 4.x
   - Currently unavailable.
   - `rp_kde4` can be built by using `nix build github:Whovian9369/rom-properties-nix-flake#rp_kde4`
-- KDE 5.x
+- Plasma/KDE 5.x
   - Currently unavailable.
   - `rp_kde5` can be built by using `nix build github:Whovian9369/rom-properties-nix-flake#rp_kde5`
 
