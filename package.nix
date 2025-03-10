@@ -82,13 +82,13 @@ stdenv.mkDerivation {
     + lib.optionalString build_gtk4_plugin "-gtk4"
     + lib.optionalString build_kf5_plugin  "-kde5"
     + lib.optionalString build_kf6_plugin  "-kde6"
-    ;
+  ;
 
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "6c58b9d74b388e6ad02c627ef263e4a160ad3c3b";
-    hash = "sha256-STGPmHRn2c4fwSjyl2qkpeb7HXacNDpREi9+uScJV9s=";
+    rev = "8704601b5c7a9145969590982a3cb138738e4ab5";
+    hash = "sha256-tDD1+wi7r9zq/u7Z0Sq3kQhIZDl7hCem/cdZCZKtjZo=";
   };
 
   dontWrapQtApps = true;
