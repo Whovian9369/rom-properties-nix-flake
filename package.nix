@@ -87,8 +87,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "8704601b5c7a9145969590982a3cb138738e4ab5";
-    hash = "sha256-tDD1+wi7r9zq/u7Z0Sq3kQhIZDl7hCem/cdZCZKtjZo=";
+    rev = "fca4e6e56dee03e9155a4acdb5a0de6053fa6449";
+    hash = "sha256-rp//+gAULKDKOrgMj8Zo5sGQ/+fPoNLZKiTl6MfV608=";
   };
 
   dontWrapQtApps = true;
