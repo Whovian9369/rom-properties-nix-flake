@@ -16,7 +16,8 @@
   in
   {
     packages.x86_64-linux = {
-      default = pkgs.callPackage ./package.nix {};
+      default = self.packages.x86_64-linux.rp_cli;
+      rp_cli = pkgs.callPackage ./package.nix {};
       rp_apparmor = pkgs.callPackage ./package.nix { useAppArmor = true; };
       # rp_gtk2 = pkgs.callPackage ./package.nix { build_xfce_plugin = true; };
       rp_gtk3 = pkgs.callPackage ./package.nix { build_gtk3_plugin = true; useTracker = true; };
