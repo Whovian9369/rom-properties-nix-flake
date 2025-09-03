@@ -136,7 +136,6 @@ stdenv.mkDerivation {
     # GTK3
     ++ lib.optionals build_gtk3_plugin  [
       lerc.dev
-      extra-cmake-modules
       gobject-introspection
     ]
 
