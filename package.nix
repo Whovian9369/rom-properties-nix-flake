@@ -14,6 +14,7 @@
   lzo,
   nettle,
   pkg-config,
+  pugixml,
   tinyxml-2,
   zlib,
   zstd,
@@ -52,6 +53,7 @@
     # Can't just pull xfce.tumbler directly.
   cairo ? null,
   gsound ? null,
+  extra-cmake-modules ? null,
   libcanberra-gtk3 ? null,
   gobject-introspection ? null,
   pango ? null,
@@ -64,6 +66,7 @@
   build_kf6_plugin ? false,
   qt6 ? null,
   kio ? null,
+  # extra-cmake-modules ? null,
   kwidgetsaddons ? null,
   kfilemetadata ? null,
   # wrapQtAppsHook ? null,
@@ -71,7 +74,7 @@
 
 stdenv.mkDerivation {
   pname = "rom-properties";
-  version = "unstable-2025-07-25"
+  version = "unstable-2025-08-30"
     + lib.optionalString build_gtk3_plugin "-gtk3"
     + lib.optionalString build_gtk4_plugin "-gtk4"
     + lib.optionalString build_kf6_plugin  "-kde6"
@@ -80,8 +83,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "17cbf6dc5799c00ac9170dc46f2b164a7e8ed1e9";
-    hash = "sha256-LSqNiDQtem6Deo0QadQK4RhFvqkMcyRsfsBzD7vuITQ=";
+    rev = "5efef4b1f975ed6087e1073ea995ccd9f36760f1";
+    hash = "sha256-wNkt+IR4PR0z4Ult761uhFKyBMdB1Z041r4sxWs5RCw=";
   };
 
   dontWrapQtApps = true;
@@ -128,6 +131,7 @@ stdenv.mkDerivation {
     cmake
     ninja
     pkg-config
+    pugixml
   ]
     # GTK3
     ++ lib.optionals build_gtk3_plugin  [
