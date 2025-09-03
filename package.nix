@@ -60,12 +60,6 @@
   build_gtk4_plugin ? false,
   gtk4 ? null,
 
-  ## KDE5
-  build_kf5_plugin ? false,
-  qt5 ? null,
-  libsForQt5 ? null,
-  extra-cmake-modules ? null,
-
   ## KDE6
   build_kf6_plugin ? false,
   qt6 ? null,
@@ -80,7 +74,6 @@ stdenv.mkDerivation {
   version = "unstable-2025-07-25"
     + lib.optionalString build_gtk3_plugin "-gtk3"
     + lib.optionalString build_gtk4_plugin "-gtk4"
-    + lib.optionalString build_kf5_plugin  "-kde5"
     + lib.optionalString build_kf6_plugin  "-kde6"
   ;
 
@@ -124,13 +117,6 @@ stdenv.mkDerivation {
           - ?
       */
 
-    # KDE 5 / Plasma 5
-      /*
-        Plasma 5:
-          - Thumbnails
-          - Has "Properties" tab
-      */
-
     # KDE 6 / Plasma 6
       /*
         Plasma 6:
@@ -143,17 +129,14 @@ stdenv.mkDerivation {
     ninja
     pkg-config
   ]
+    # GTK3
     ++ lib.optionals build_gtk3_plugin  [
       lerc.dev
       extra-cmake-modules
       gobject-introspection
     ]
-    # KDE 5
-    ++ lib.optionals build_kf5_plugin  [
-      lerc.dev
-      extra-cmake-modules
-    ]
-    # KDE 6
+
+    # QT 6 / KDE 6
     ++ lib.optionals build_kf6_plugin  [
       lerc.dev
       extra-cmake-modules
@@ -204,18 +187,15 @@ stdenv.mkDerivation {
       libcanberra-gtk3
       pango.dev
     ]
+
+    # GTK4
     ++ lib.optionals build_gtk4_plugin [
       gtk4
       cairo
       gsound
     ]
-    ++ lib.optionals build_kf5_plugin  [
-      libsForQt5.qt5.qtbase
-      libsForQt5.kwidgetsaddons
-      libsForQt5.kio
-      libsForQt5.kfilemetadata
-      libcanberra_kde
-    ]
+
+    # QT 6 / KDE 6
     ++ lib.optionals build_kf6_plugin  [
       qt6.qtbase
       kio
@@ -351,10 +331,6 @@ stdenv.mkDerivation {
       (lib.cmakeFeature "UI_FRONTENDS" "KDE4")
     ]
     */
-    ++ lib.optionals build_kf5_plugin  [
-      (lib.cmakeFeature "UI_FRONTENDS" "KF5")
-      (lib.cmakeFeature "QT_MAJOR_VERSION" "5")
-    ]
     ++ lib.optionals build_kf6_plugin  [
       (lib.cmakeFeature "UI_FRONTENDS" "KF6")
       (lib.cmakeFeature "QT_MAJOR_VERSION" "6")
@@ -384,13 +360,6 @@ stdenv.mkDerivation {
       ./patches/fix_kf6_plugindir.diff
         # Fix plugin path by removing logic to automatically find it.
         # Thank you for helping with this patch, @leo60228!
-    ]
-
-    ++ lib.optionals build_kf5_plugin [
-      ./patches/fix_kf5_plugindir.diff
-        # Fix plugin path by removing logic to automatically find it.
-        # Based on fix_kf6_plugindir.diff that @leo60228 originally added, so
-        # thank you to leo!
     ];
 
   /* About used patches:
@@ -433,7 +402,6 @@ stdenv.mkDerivation {
       + lib.optionalString build_gtk3_plugin " (GTK3)"
       + lib.optionalString build_gtk4_plugin " (GTK4)"
       # + lib.optionalString build_kde4_plugin " (KDE4)"
-      + lib.optionalString build_kf5_plugin  " (KDE5)"
       + lib.optionalString build_kf6_plugin  " (KDE6)"
       # + lib.optionalString build_xfce_plugin " (XFCE)"
       ;

@@ -22,7 +22,6 @@
       # rp_gtk2 = pkgs.callPackage ./package.nix { build_xfce_plugin = true; };
       rp_gtk3 = pkgs.callPackage ./package.nix { build_gtk3_plugin = true; useTracker = true; };
       rp_gtk4 = pkgs.callPackage ./package.nix { build_gtk4_plugin = true; };
-      rp_kde5 = pkgs.libsForQt5.callPackage ./package.nix { build_kf5_plugin = true; };
       rp_kde6 = pkgs.kdePackages.callPackage ./package.nix { build_kf6_plugin = true; };
     };
   };
