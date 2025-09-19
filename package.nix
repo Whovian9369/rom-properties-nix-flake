@@ -240,6 +240,8 @@ stdenv.mkDerivation {
   separateDebugInfo = true;
 
   cmakeFlags = [
+    # Check /cmake/options.cmake for these flags and information.
+
     # (lib.cmakeBool "BUILD_CLI" true)
     /*
       Build the `rpcli` command line program.
@@ -253,6 +255,7 @@ stdenv.mkDerivation {
       # TODO: Try to fix(?) AppArmor support
     (lib.cmakeBool "ENABLE_DECRYPTION" true)
       # Enable decryption for newer ROM and disc images.
+
     (lib.cmakeBool "ENABLE_EXTRA_SECURITY" true)
       # Enable extra security functionality if available.
     (lib.cmakeBool "ENABLE_JPEG" true)
