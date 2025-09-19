@@ -15,7 +15,6 @@
   nettle,
   pkg-config,
   pugixml,
-  tinyxml-2,
   zlib,
   zstd,
 
@@ -162,7 +161,6 @@ stdenv.mkDerivation {
     zstd
     gettext
     lzo
-    tinyxml-2
     minizip-ng
     inih
     gtk3
