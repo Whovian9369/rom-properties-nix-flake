@@ -182,7 +182,7 @@ stdenv.mkDerivation {
       # Also has useTracker set, so uses pkgs.tinysparql
       cairo
       gsound
-      xfce.tumbler.dev
+      xfce.tumbler
       xfce.thunar.dev
       gtk3.dev
       libcanberra-gtk3
