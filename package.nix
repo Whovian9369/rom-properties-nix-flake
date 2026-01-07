@@ -48,14 +48,14 @@
   ## XFCE (GTK+ 3.x)
   build_gtk3_plugin ? false,
   gtk3 ? null,
-  xfce ? null,
-    # Can't just pull xfce.tumbler directly.
+  tumbler ? null,
   cairo ? null,
   gsound ? null,
   extra-cmake-modules ? null,
   libcanberra-gtk3 ? null,
   gobject-introspection ? null,
   pango ? null,
+  thunar ? null,
 
   ## XFCE (GTK+ 4.x)?
   build_gtk4_plugin ? false,
@@ -164,7 +164,7 @@ stdenv.mkDerivation {
     minizip-ng
     inih
     gtk3
-    xfce.tumbler
+    # tumbler
     gsound
     libsysprof-capture
       # Not really required afaik, but I like quieting the warnings :)
@@ -182,8 +182,8 @@ stdenv.mkDerivation {
       # Also has useTracker set, so uses pkgs.tinysparql
       cairo
       gsound
-      xfce.tumbler
-      xfce.thunar.dev
+      tumbler
+      thunar.dev
       gtk3.dev
       libcanberra-gtk3
       pango.dev
