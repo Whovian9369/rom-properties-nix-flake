@@ -12,6 +12,7 @@
   libseccomp,
   lz4,
   lzo,
+  makeWrapper,
   nettle,
   pkg-config,
   pugixml,
@@ -128,6 +129,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     cmake
+    makeWrapper
     ninja
     pkg-config
     pugixml
@@ -400,6 +402,11 @@ stdenv.mkDerivation {
     More information can be found on the relevant commit message.
     GerbilSoft/rom-properties/commit/ff6c90736d1d598be54bafccb12f590e0ff3e905
   */
+
+  postFixup = ''
+    wrapProgram $out/libexec/rp-download \
+      --suffix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ curl ]}"
+  '';
 
   meta = {
     description = "ROM Properties Page shell extension"
