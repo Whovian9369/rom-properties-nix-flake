@@ -57,9 +57,18 @@
   pango ? null,
   thunar ? null,
 
+  ## MATE / Caja
+  mate ? null,
+
+  ## Cinnamon / Nemo
+  nemo ? null,
+
   ## XFCE (GTK+ 4.x)?
   build_gtk4_plugin ? false,
   gtk4 ? null,
+
+  ## Nautilus
+  nautilus ? null,
 
   ## KDE6
   build_kf6_plugin ? false,
@@ -136,6 +145,13 @@ stdenv.mkDerivation {
     ++ lib.optionals build_gtk3_plugin  [
       lerc.dev
       gobject-introspection
+      nemo.dev
+      mate.caja
+    ]
+
+    # GTK4
+    ++ lib.optionals build_gtk4_plugin  [
+      nautilus.dev
     ]
 
     # QT 6 / KDE 6
