@@ -82,7 +82,7 @@
 
 stdenv.mkDerivation {
   pname = "rom-properties";
-  version = "unstable-2026-02-02"
+  version = "unstable-2026-02-21"
     + lib.optionalString build_gtk3_plugin "-gtk3"
     + lib.optionalString build_gtk4_plugin "-gtk4"
     + lib.optionalString build_kf6_plugin  "-kde6"
