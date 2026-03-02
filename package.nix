@@ -91,8 +91,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "534f6fcdac6f93cf0400a321d0a73c67b705c621";
-    hash = "sha256-2VJcvKANcQX9Uws2wX9hbO8VfTtTCOAzZxMkYOildTk=";
+    rev = "380b000fc5b0fa3a8cd2520d444e1aad782bc5f3";
+    hash = "sha256-3AlfP9Ev2yhD1oL60RnzElM1XaB4z3Xfg/Hu2f647lc=";
   };
 
   dontWrapQtApps = true;
@@ -101,7 +101,7 @@ stdenv.mkDerivation {
     mkdir -p ${placeholder "out"}/lib/glib-2.0/include
   '';
 
-  # Plugin Coverage notes:
+  # Plugin Coverage notes - At least, as of 2025-02-24:
     # GTK 3 - MATE, Cinnamon, and XFCE
       /*
         MATE (Caja):
