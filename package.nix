@@ -58,7 +58,7 @@
   thunar ? null,
 
   ## MATE / Caja
-  mate ? null,
+  caja ? null,
 
   ## Cinnamon / Nemo
   nemo ? null,
@@ -91,8 +91,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "64e32fb0fecf36bd4246d055d455e4b80dd6c748";
-    hash = "sha256-45ctrq4ARrfiHbTdQN+v+MLk3b8UyZ2Xu1rJ5NM5aTE=";
+    rev = "8b4b69fcba19b2f1fb5d7c82eaacc095c753593f";
+    hash = "sha256-jlYrAbGfVMzhq7JslzDQ1FYW77rZ7nXbN5BwijXdayc=";
   };
 
   dontWrapQtApps = true;
@@ -146,7 +146,7 @@ stdenv.mkDerivation {
       lerc.dev
       gobject-introspection
       nemo.dev
-      mate.caja
+      caja
     ]
 
     # GTK4
