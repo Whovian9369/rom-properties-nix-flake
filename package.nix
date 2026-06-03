@@ -82,7 +82,7 @@
 
 stdenv.mkDerivation {
   pname = "rom-properties";
-  version = "unstable-2026-03-28"
+  version = "unstable-2026-05-31"
     + lib.optionalString build_gtk3_plugin "-gtk3"
     + lib.optionalString build_gtk4_plugin "-gtk4"
     + lib.optionalString build_kf6_plugin  "-kde6"
@@ -91,8 +91,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "8b4b69fcba19b2f1fb5d7c82eaacc095c753593f";
-    hash = "sha256-jlYrAbGfVMzhq7JslzDQ1FYW77rZ7nXbN5BwijXdayc=";
+    rev = "b9d7b5841db365983b19cabf8801ef2dde439e78";
+    hash = "sha256-q5jD3I7I4MV7l+mJouJnUc1u7cw6W1p4q4yQ16QYwKc=";
   };
 
   dontWrapQtApps = true;
