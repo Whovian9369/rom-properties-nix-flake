@@ -33,10 +33,6 @@
   useTracker ? false,
   tinysparql,
 
-  # Enable AppArmor rules
-  useAppArmor ? false,
-  # libapparmor,
-
   # Build GUI Plugins
   ## Pre-requisites for multiple plugins
   fmt ? null,
@@ -189,9 +185,6 @@ stdenv.mkDerivation {
     # GNOME Tracker
     ++ lib.optionals useTracker [ tinysparql ]
 
-    # AppArmor
-    # ++ lib.optionals useAppArmor [ libapparmor ]
-
     # GUI Plugins
     # ++ lib.optionals build_xfce_plugin [ gtk2 cairo gsound ]
     ++ lib.optionals build_gtk3_plugin [
@@ -265,10 +258,6 @@ stdenv.mkDerivation {
       setting it again.
     */
 
-    (lib.cmakeBool "INSTALL_APPARMOR" useAppArmor)
-      # Required for build since it wants to write to "/etc/apparmor.d"
-      # Can I change its directory to technically include it?
-      # TODO: Try to fix(?) AppArmor support
     (lib.cmakeBool "ENABLE_DECRYPTION" true)
       # Enable decryption for newer ROM and disc images.
 
@@ -334,10 +323,6 @@ stdenv.mkDerivation {
     ++ lib.optionals useTracker [
       (lib.cmakeFeature "TRACKER_INSTALL_API_VERSION" "3")
     ]
-    # AppArmor
-    ++ lib.optionals useAppArmor [
-      (lib.cmakeFeature "DIR_INSTALL_APPARMOR" "${placeholder "out"}/etc/apparmor.d")
-    ]
     # GUI Plugins
     ++ lib.optionals build_gtk3_plugin [
       (lib.cmakeFeature "UI_FRONTENDS" "GTK3")
@@ -367,10 +352,6 @@ stdenv.mkDerivation {
     ./patches/fix_libexec.diff
       # Thank you for helping with this patch, @leo60228!
   ]
-    ++ lib.optionals useAppArmor [
-      ./patches/fix_apparmor_output.diff
-    ]
-
     ++ lib.optionals build_gtk3_plugin [
       ./patches/fix_gtk3_plugindir.diff
         # Fix plugin path to not include the full path to $out
@@ -386,35 +367,10 @@ stdenv.mkDerivation {
     `fix_libexec.diff` fixes where `result/lib/libromdata.so.5.0` looks for
       `rp-download` at runtime. Seems to mainly affect use of the GUI plugin.
 
-    `fix_apparmor_output.diff` lets us override the default output directory
-      for AppArmor profiles. This makes it so the build process doesn't try to
-      write to an FHS-only directory, and makes it more follow (with the help of
-      a CMake flag) the suggested Nix packaging style.
-
     `fix_kf6_plugindir.diff` fixes the KDE 6 plugin path.
       Makes the build use KDE's `cmake` logic for finding the plugin install
       path instead of doing it manually.
       (Technically it's a Qt thing and not KDE, but this is for KDE so...)
-  */
-
-  postInstall = lib.optionals useAppArmor ''
-    mv "$out/etc/apparmor.d/"*rp-download "$out/etc/apparmor.d/bin.rp-download"
-  '';
-  /*
-    `mv` required to properly(?) set filename for AppArmor Profile instead of
-    the default filename, which included the full nix store path (with full
-    stops instead of slashes as path delimiters.) and thus shouldn't be included
-    as part of the build. I don't think that the original (full path) filename
-    would actually work for AppArmor reasons? I'm not sure, but it seems like
-    the smartest idea for me to change it.
-
-    Commit from 2024-03-01 disables the AppArmor rules for `rpcli`
-    Supposedly due to the rules possibly blocking proper use in the user's
-    `$HOME` directory.
-    "It's not allowing writes to the user's home directory, which prevents
-    extracting images."
-    More information can be found on the relevant commit message.
-    GerbilSoft/rom-properties/commit/ff6c90736d1d598be54bafccb12f590e0ff3e905
   */
 
   meta = {
