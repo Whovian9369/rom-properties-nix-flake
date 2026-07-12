@@ -3,3 +3,5 @@
   # Symlink for program build
 /*.md
   # Notes files that aren't needed to be pushed.
+/*.log
+  # Ignore `log` files for debugging notes.
