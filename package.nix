@@ -78,7 +78,7 @@
 
 stdenv.mkDerivation {
   pname = "rom-properties";
-  version = "unstable-2026-05-31"
+  version = "unstable-2026-07-13"
     + lib.optionalString build_gtk3_plugin "-gtk3"
     + lib.optionalString build_gtk4_plugin "-gtk4"
     + lib.optionalString build_kf6_plugin  "-kde6"
@@ -87,8 +87,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "b9d7b5841db365983b19cabf8801ef2dde439e78";
-    hash = "sha256-q5jD3I7I4MV7l+mJouJnUc1u7cw6W1p4q4yQ16QYwKc=";
+    rev = "f1c4b9e81b057d0917fb4ee16552c493b3bf39b2";
+    hash = "sha256-JZCdjeQmLyL0XnCFAWVWqOG/YHR8zaBPQTPOITZJM7Y=";
   };
 
   dontWrapQtApps = true;
@@ -258,6 +258,9 @@ stdenv.mkDerivation {
       setting it again.
     */
 
+    (lib.cmakeBool "INSTALL_APPARMOR" false)
+      # Explicitly disable AppArmor rule installation since I doubt it's used at alll.
+
     (lib.cmakeBool "ENABLE_DECRYPTION" true)
       # Enable decryption for newer ROM and disc images.
 
@@ -327,6 +330,7 @@ stdenv.mkDerivation {
     ++ lib.optionals build_gtk3_plugin [
       (lib.cmakeFeature "UI_FRONTENDS" "GTK3")
       (lib.cmakeFeature "GTK3_GLIBCONFIG_INCLUDE_DIR" "${placeholder "out"}/lib/glib-2.0/include")
+      # (lib.cmakeFeature "LibNemoExtension_EXTENSION_DIR" "${placeholder "out"}/lib/caja/extensions-2.0")
     ]
     ++ lib.optionals build_gtk4_plugin [
       (lib.cmakeFeature "UI_FRONTENDS" "GTK4")

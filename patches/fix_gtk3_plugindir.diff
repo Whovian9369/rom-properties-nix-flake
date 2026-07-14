@@ -1,8 +1,21 @@
+diff --git a/cmake/libs/FindLibCajaExtension.cmake b/cmake/libs/FindLibCajaExtension.cmake
+index 28f04a3c3..dea480475 100644
+--- a/cmake/libs/FindLibCajaExtension.cmake
++++ b/cmake/libs/FindLibCajaExtension.cmake
+@@ -27,7 +27,7 @@ FIND_LIBRARY_PKG_CONFIG(LibCajaExtension
+ IF(LibCajaExtension_FOUND AND NOT LibCajaExtension_EXTENSION_DIR)
+ 	MESSAGE(WARNING "LibCajaExtension_EXTENSION_DIR is not set; using defaults.")
+ 	INCLUDE(DirInstallPaths)
+-	SET(LibCajaExtension_EXTENSION_DIR "${CMAKE_INSTALL_PREFIX}/${DIR_INSTALL_LIB}/caja/extensions-2.0" CACHE INTERNAL "LibCajaExtension_EXTENSION_DIR")
++	SET(LibCajaExtension_EXTENSION_DIR "${CMAKE_INSTALL_LIBDIR}/caja/extensions-2.0" CACHE INTERNAL "LibCajaExtension_EXTENSION_DIR")
+ ENDIF(LibCajaExtension_FOUND AND NOT LibCajaExtension_EXTENSION_DIR)
+ 
+ # Extensions descriptions directory
 diff --git a/src/gtk/gtk3/CMakeLists.txt b/src/gtk/gtk3/CMakeLists.txt
-index bd300b589..39459f8e7 100644
+index 41d3c2590..bf4fc3631 100644
 --- a/src/gtk/gtk3/CMakeLists.txt
 +++ b/src/gtk/gtk3/CMakeLists.txt
-@@ -31,7 +31,7 @@ IF(GLib2_FOUND AND GObject2_FOUND AND GIO_FOUND AND GIO-UNIX_FOUND AND CairoGObj
+@@ -31,33 +31,38 @@ IF(GLib2_FOUND AND GObject2_FOUND AND GIO_FOUND AND GIO-UNIX_FOUND AND CairoGObj
  		ELSE(LibNautilusExtension4_FOUND)
  			# Neither v3 nor v4 were found.
  			MESSAGE(STATUS "LibNautilusExtension not found. Using the default extensions directory.")
@@ -11,8 +24,12 @@ index bd300b589..39459f8e7 100644
  		ENDIF(LibNautilusExtension4_FOUND)
  	ENDIF(LibNautilusExtension_FOUND)
  
-@@ -41,7 +41,7 @@ IF(GLib2_FOUND AND GObject2_FOUND AND GIO_FOUND AND GIO-UNIX_FOUND AND CairoGObj
- 		SET(LibCajaExtension3_EXTENSION_DIR "${LibCajaExtension_EXTENSION_DIR}")
+ 	# Caja (MATE)
+ 	FIND_PACKAGE(LibCajaExtension 1.18.0)
+ 	IF(LibCajaExtension_FOUND)
+-		SET(LibCajaExtension3_EXTENSION_DIR "${LibCajaExtension_EXTENSION_DIR}")
++		MESSAGE(STATUS "Forcing LibCajaExtension3_EXTENSION_DIR to default extensions directory.")
++		SET(LibCajaExtension3_EXTENSION_DIR "${CMAKE_INSTALL_LIBDIR}/caja/extensions-2.0")
  	ELSE(LibCajaExtension_FOUND)
  		MESSAGE(STATUS "LibCajaExtension not found. Using the default extensions directory.")
 -		SET(LibCajaExtension3_EXTENSION_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/caja/extensions-2.0")
@@ -20,8 +37,11 @@ index bd300b589..39459f8e7 100644
  	ENDIF(LibCajaExtension_FOUND)
  
  	# Nemo (Cinnamon)
-@@ -50,14 +50,14 @@ IF(GLib2_FOUND AND GObject2_FOUND AND GIO_FOUND AND GIO-UNIX_FOUND AND CairoGObj
- 		SET(LibNemoExtension3_EXTENSION_DIR "${LibNemoExtension_EXTENSION_DIR}")
+ 	FIND_PACKAGE(LibNemoExtension)
+ 	IF(LibNemoExtension_FOUND)
+-		SET(LibNemoExtension3_EXTENSION_DIR "${LibNemoExtension_EXTENSION_DIR}")
++		MESSAGE(STATUS "Forcing LibNemoExtension3_EXTENSION_DIR to default extensions directory.")
++		SET(LibNemoExtension3_EXTENSION_DIR "${CMAKE_INSTALL_LIBDIR}/nemo/extensions-3.0")
  	ELSE(LibNemoExtension_FOUND)
  		MESSAGE(STATUS "LibNemoExtension not found. Using the default extensions directory.")
 -		SET(LibNemoExtension3_EXTENSION_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/nemo/extensions-3.0")
@@ -30,7 +50,11 @@ index bd300b589..39459f8e7 100644
  
  	# ThunarX3 (XFCE)
  	FIND_PACKAGE(ThunarX3)
- 	IF(NOT ThunarX3_FOUND)
+-	IF(NOT ThunarX3_FOUND)
++	IF(ThunarX3_FOUND)
++		MESSAGE(STATUS "Forcing ThunarX3_EXTENSIONS_DIR to default extensions directory.")
++		SET(ThunarX3_EXTENSIONS_DIR "${CMAKE_INSTALL_LIBDIR}/thunarx-3")
++	ELSE(ThunarX3_FOUND)
  		MESSAGE(STATUS "ThunarX3 not found. Using the default extensions directory.")
 -		SET(ThunarX3_EXTENSIONS_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/thunarx-3")
 +		SET(ThunarX3_EXTENSIONS_DIR "${CMAKE_INSTALL_LIBDIR}/thunarx-3")
@@ -38,7 +62,7 @@ index bd300b589..39459f8e7 100644
  ELSE()
  	# GTK+ 3.x (or required dependencies) were not found.
 diff --git a/src/libunixcommon/CMakeLists.txt b/src/libunixcommon/CMakeLists.txt
-index fc0f54bc7..d583f2011 100644
+index f552a3a8e..51091c5aa 100644
 --- a/src/libunixcommon/CMakeLists.txt
 +++ b/src/libunixcommon/CMakeLists.txt
 @@ -21,7 +21,7 @@ IF(BUILD_XFCE)
