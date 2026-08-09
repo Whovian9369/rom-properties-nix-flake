@@ -87,8 +87,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "GerbilSoft";
     repo = "rom-properties";
-    rev = "f1c4b9e81b057d0917fb4ee16552c493b3bf39b2";
-    hash = "sha256-JZCdjeQmLyL0XnCFAWVWqOG/YHR8zaBPQTPOITZJM7Y=";
+    rev = "8325a2068225d297bfc44807556efeb10d2859a4";
+    hash = "sha256-Hfk0aOlNOZrwItIyZL5t9TkfsAVDzXy7MEIDqe3qVsA=";
   };
 
   dontWrapQtApps = true;
@@ -258,58 +258,57 @@ stdenv.mkDerivation {
       setting it again.
     */
 
+    # Explicitly disable AppArmor rule installation since I doubt it's used at alll.
     (lib.cmakeBool "INSTALL_APPARMOR" false)
-      # Explicitly disable AppArmor rule installation since I doubt it's used at alll.
 
+    # Enable decryption for newer ROM and disc images.
     (lib.cmakeBool "ENABLE_DECRYPTION" true)
-      # Enable decryption for newer ROM and disc images.
 
+    # Enable extra security functionality if available.
     (lib.cmakeBool "ENABLE_EXTRA_SECURITY" true)
-      # Enable extra security functionality if available.
+    # Enable JPEG decoding using libjpeg.
     (lib.cmakeBool "ENABLE_JPEG" true)
-      # Enable JPEG decoding using libjpeg.
+    # Enable XML parsing for e.g. Windows manifests.
     (lib.cmakeBool "ENABLE_XML" true)
-      # Enable XML parsing for e.g. Windows manifests.
+    # Enable UnICE68 for Atari ST SNDH files. (GPLv3)
     (lib.cmakeBool "ENABLE_UNICE68" true)
-      # Enable UnICE68 for Atari ST SNDH files. (GPLv3)
+    # Enable libmspack-xenia for Xbox 360 executables.
     (lib.cmakeBool "ENABLE_LIBMSPACK" true)
-      # Enable libmspack-xenia for Xbox 360 executables.
+    # Enable the PowerVR Native SDK subset for PVRTC decompression.
     (lib.cmakeBool "ENABLE_PVRTC" true)
-      # Enable the PowerVR Native SDK subset for PVRTC decompression.
+    # Enable ZSTD decompression. (Required for some unit tests.)
     (lib.cmakeBool "ENABLE_ZSTD" true)
-      # Enable ZSTD decompression. (Required for some unit tests.)
+    # Enable the ASTC decoder from Basis Universal.
     (lib.cmakeBool "ENABLE_ASTC" true)
-      # Enable the ASTC decoder from Basis Universal.
+    # Enable LZ4 decompression. (Required for some PSP disc formats.)
     (lib.cmakeBool "ENABLE_LZ4" true)
-      # Enable LZ4 decompression. (Required for some PSP disc formats.)
+    # Enable LZO decompression. (Required for some PSP disc formats.)
     (lib.cmakeBool "ENABLE_LZO" true)
-      # Enable LZO decompression. (Required for some PSP disc formats.)
+    # Enable NLS. (internationalization)
+    # Enable NLS using gettext for localized messages.
     (lib.cmakeBool "ENABLE_NLS" true)
-      # Enable NLS. (internationalization)
-      # Enable NLS using gettext for localized messages.
+    # Enable OpenMP support if available.
     (lib.cmakeBool "ENABLE_OPENMP" true)
-      # Enable OpenMP support if available.
+    # Let Nix handle the debug files with "separateDebugInfo" instead of letting the normal build process do it.
+    # Should prevent duplicate entries in .#default.debug.outpath .
     (lib.cmakeBool "SPLIT_DEBUG" false)
-      # Let Nix handle the debug files with "separateDebugInfo" instead of
-      # letting the normal build process do it.
-      # Should prevent duplicate entries in .#default.debug.outpath .
+    # Install the split debug files, if those are enabled via "SPLIT_DEBUG".
     (lib.cmakeBool "INSTALL_DEBUG" false)
-      # Install the split debug files, if those are enabled via "SPLIT_DEBUG".
+    # Special handling for NixOS
+    /*
+      Basically a hack to fix two issues I had made patches for before
+      reporting the issues upstream.
+
+      Due to odd path issues, debug file paths were seemingly duplicated
+      multiple times in the output path.
+
+      There's also a fix for system calls used, but only appears to be
+      required on NixOS?
+
+      Specifics can be found at
+      https://github.com/GerbilSoft/rom-properties/commit/adc780f1138a1450fcf98e183253d2a3fa3ce46a
+    */
     (lib.cmakeBool "ENABLE_NIXOS" true)
-      # Special handling for NixOS
-      /*
-        Basically a hack to fix two issues I had made patches for before
-        reporting the issues upstream.
-
-        Due to odd path issues, debug file paths were seemingly duplicated
-        multiple times in the output path.
-
-        There's also a fix for system calls used, but only appears to be
-        required on NixOS?
-
-        Specifics can be found at
-        https://github.com/GerbilSoft/rom-properties/commit/adc780f1138a1450fcf98e183253d2a3fa3ce46a
-      */
 
     /*
       # Flags enabled when on Windows
